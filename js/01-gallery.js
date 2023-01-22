@@ -26,14 +26,28 @@ gallery.insertAdjacentHTML("beforeend", imgList);
 gallery.addEventListener("click", (event) => {
   event.preventDefault();
 
-  const instance = basicLightbox.create(`
-    <img src="${event.target.dataset.source}" width="800" height="600">
-`);
+  if (event.target.nodeName !== "IMG") return;
+  const instance = basicLightbox.create(
+    `
+    <img src="${event.target.dataset.source}" width="800" height="600">`,
+    {
+      onShow: (instance) => {
+        document.addEventListener("keydown", closeEsc);
+        console.log("onShow", instance);
+      },
+      onClose: (instance) => {
+        document.removeEventListener("keydown", closeEsc);
+        console.log("onClose", instance);
+      },
+    }
+  );
 
   instance.show();
-  gallery.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
+
+  function closeEsc(item) {
+    if (item.key === "Escape") {
       instance.close();
     }
-  });
+  }
 });
+
